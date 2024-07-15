@@ -1,6 +1,6 @@
 app:
   title: Scaffolded Backstage App
-  baseUrl: http://localhost:3000
+  baseUrl: http://0.0.0.0:3000
 
 organization:
   name: My Company
@@ -103,3 +103,7 @@ catalog:
     #   target: https://github.com/backstage/backstage/blob/master/packages/catalog-model/examples/acme-corp.yaml
     #   rules:
     #     - allow: [User, Group]
+konnect:
+  baseUrl: https://us.api.konghq.com/v2/
+  cloudUrl: https://cloud.konghq.com/us
+  accessToken: kpat_ByjCOGRmPyPnOFVvHkboY6eXDO5C161wOkbewdcL23CAQU3Ae
