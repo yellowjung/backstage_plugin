@@ -12,6 +12,9 @@ apiVersion: backstage.io/v1alpha1
 kind: Component
 metadata:
   name: example-website
+  annotations:
+    konnect/control-plane-id: dac459de-0d41-49d7-888d-fa3711663d67
+    konnect/gateway-service-id: 0abc08f9-ed6b-40f3-b3f4-084715dfe0c4
 spec:
   type: website
   lifecycle: experimental

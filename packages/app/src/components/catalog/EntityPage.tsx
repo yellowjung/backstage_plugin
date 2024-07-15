@@ -207,6 +207,9 @@ const websiteEntityPage = (
     <EntityLayout.Route path="/docs" title="Docs">
       {techdocsContent}
     </EntityLayout.Route>
+    <EntityLayout.Route path="/konnect-frontend" title="Konnect">
+      <KonnectFrontendPage/>
+    </EntityLayout.Route>
   </EntityLayout>
 );
 

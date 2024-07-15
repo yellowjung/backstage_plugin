@@ -10,7 +10,7 @@ import { createRouter } from './service/router';
  * @public
  */
 export const konnectBackendPlugin = createBackendPlugin({
-  pluginId: 'konnectBackendPlugin',
+  pluginId: 'konnect-backend',
   register(env) {
     env.registerInit({
       deps: {

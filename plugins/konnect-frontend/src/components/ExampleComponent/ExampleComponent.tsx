@@ -21,43 +21,44 @@ import { Route, Plugin, konnectApiRef, GatewayService } from '../../types';
 import { useApi, configApiRef } from '@backstage/core-plugin-api';
 
 export const ExampleComponent = () => {
-  
-  const { entity } = useEntity();
+
+  const {entity} = useEntity();
 
   const { controlPlaneId, gatewayServiceId } = useKonnectEntityData({entity}); 
-  const [ gatewayServiceData, setGatewayServiceData] = useState({} as any);
-  const [ routeData, setRouteData] = useState<Route[]>([]);
-  const [ pluginData, setPluginData] = useState<Plugin[]>([]);
+  const [gatewayServiceData, setGatewayServiceData] = useState({} as any);
+  const [routeData, setRouteData] = useState<Route[]>([]);
+  const [pluginData, setPluginData] = useState<Plugin[]>([]);
 
+  // config data
   const config = useApi(configApiRef);
   const konnectBackendApi = useApi(konnectApiRef);
 
   const {baseUrl} = useKonnectConfigData({config});
 
-  const gatewayServiceUrl = `${baseUrl}/gateway-manager/${controlPlaneId}/gateway-services/${gatewayServiceId}`
+  //pass into the gateway service component
+  const gatewayServiceUrl = `${baseUrl}/gateway-manager/${controlPlaneId}/gateway-services/${gatewayServiceId}` 
 
-  const getGatewayService = async () => {
-    const gateServiceData: GatewayService = await konnectBackendApi.getService(controlPlaneId, gatewayServiceId);
-    setGatewayServiceData(gateServiceData);
-  }
+  const getGatweayService = async () => {
+    const gatewayServiceData: GatewayService = await konnectBackendApi.getService(controlPlaneId, gatewayServiceId);
+    setGatewayServiceData(gatewayServiceData);
+  };
 
   const getRoutes = async () => {
-    const routes = await konnectBackendApi.getRoutesByService(controlPlaneId, gatewayServiceData);
+    const routes = await konnectBackendApi.getRoutesByService(controlPlaneId, gatewayServiceId);
     setRouteData(routes);
-  }
+  };
 
   const getPlugins = async () => {
-    const plugins = await konnectBackendApi.getPluginsByService(controlPlaneId, gatewayServiceData);
+    const plugins = await konnectBackendApi.getPluginsByService(controlPlaneId, gatewayServiceId);
     setPluginData(plugins);
-  }
-
+  };
 
   useEffect(() => {
-    getGatewayService();
+    getGatweayService();
     getRoutes();
     getPlugins();
   },[]);
-
+  
   //konnect components
   return (
     <Page themeId="tool">
