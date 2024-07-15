@@ -1,38 +1,93 @@
 import React from 'react';
-import { Typography, Grid } from '@material-ui/core';
+import { useState, useEffect } from 'react';
+import { useEntity } from '@backstage/plugin-catalog-react';
+import { Grid } from '@material-ui/core';
 import {
-  InfoCard,
-  Header,
   Page,
   Content,
   ContentHeader,
   HeaderLabel,
   SupportButton,
+  Header
 } from '@backstage/core-components';
-import { ExampleFetchComponent } from '../ExampleFetchComponent';
+import { 
+  GatewayServiceHeader, 
+  GatewayServiceConfig,
+  KonnectPluginTable,
+  KonnectRouteTable,
+} from '../KonnectComponents';
+import { useKonnectConfigData, useKonnectEntityData } from './useKonnectData';
+import { Route, Plugin, konnectApiRef, GatewayService } from '../../types';
+import { useApi, configApiRef } from '@backstage/core-plugin-api';
 
-export const ExampleComponent = () => (
-  <Page themeId="tool">
-    <Header title="Welcome to konnect-frontend!" subtitle="Optional subtitle">
-      <HeaderLabel label="Owner" value="Team X" />
-      <HeaderLabel label="Lifecycle" value="Alpha" />
-    </Header>
-    <Content>
-      <ContentHeader title="Plugin title">
-        <SupportButton>A description of your plugin goes here.</SupportButton>
-      </ContentHeader>
-      <Grid container spacing={3} direction="column">
-        <Grid item>
-          <InfoCard title="Information card">
-            <Typography variant="body1">
-              All content should be wrapped in a card like this.
-            </Typography>
-          </InfoCard>
+export const ExampleComponent = () => {
+  
+  const { entity } = useEntity();
+
+  const { controlPlaneId, gatewayServiceId } = useKonnectEntityData({entity}); 
+  const [ gatewayServiceData, setGatewayServiceData] = useState({} as any);
+  const [ routeData, setRouteData] = useState<Route[]>([]);
+  const [ pluginData, setPluginData] = useState<Plugin[]>([]);
+
+  const config = useApi(configApiRef);
+  const konnectBackendApi = useApi(konnectApiRef);
+
+  const {baseUrl} = useKonnectConfigData({config});
+
+  const gatewayServiceUrl = `${baseUrl}/gateway-manager/${controlPlaneId}/gateway-services/${gatewayServiceId}`
+
+  const getGatewayService = async () => {
+    const gateServiceData: GatewayService = await konnectBackendApi.getService(controlPlaneId, gatewayServiceId);
+    setGatewayServiceData(gateServiceData);
+  }
+
+  const getRoutes = async () => {
+    const routes = await konnectBackendApi.getRoutesByService(controlPlaneId, gatewayServiceData);
+    setRouteData(routes);
+  }
+
+  const getPlugins = async () => {
+    const plugins = await konnectBackendApi.getPluginsByService(controlPlaneId, gatewayServiceData);
+    setPluginData(plugins);
+  }
+
+
+  useEffect(() => {
+    getGatewayService();
+    getRoutes();
+    getPlugins();
+  },[]);
+
+  //konnect components
+  return (
+    <Page themeId="tool">
+      <Header title="Kong Konnect" subtitle="Gateway Manager Plugin">
+        <HeaderLabel label="Control Plane" value={controlPlaneId} />
+        <HeaderLabel label="Gateway Service" value={gatewayServiceData.name} />
+      </Header>
+      <Content>
+        <ContentHeader title="Gateway Service">
+          <SupportButton>This plugin provides a overview of the Konnect Gateway Service</SupportButton>
+        </ContentHeader>
+        <Grid container spacing={3} direction="column">
+          <Grid item>
+            <GatewayServiceHeader data={gatewayServiceData} url={gatewayServiceUrl}/>
+          </Grid>
+          <Grid item>
+            <Grid container spacing={3} direction='row'>
+              <Grid item>
+                <GatewayServiceConfig data={gatewayServiceData}/>
+              </Grid>
+              <Grid item>
+                <KonnectRouteTable data={routeData}/>
+              </Grid>
+              <Grid item>
+                <KonnectPluginTable data={pluginData}/>
+              </Grid>
+            </Grid>
+          </Grid>
         </Grid>
-        <Grid item>
-          <ExampleFetchComponent />
-        </Grid>
-      </Grid>
-    </Content>
-  </Page>
-);
+      </Content>
+    </Page>
+  );
+};
